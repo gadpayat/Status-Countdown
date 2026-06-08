@@ -61,17 +61,22 @@ tr:nth-child(even){
 }
 
 .running{
-    color:#00ff00;
+    color:#0453db;
+    font-weight:bold;
+}
+
+.ahead{
+    color:#04c41a;
     font-weight:bold;
 }
 
 .completed{
-    color:#00bfff;
+    color:#04c41a;
     font-weight:bold;
 }
 
 .delayed{
-    color:#c77dff;
+    color:#f50707;
     font-weight:bold;
 }
 
@@ -84,6 +89,7 @@ input[type="date"]{
 }
 </style>
 </head>
+
 <body>
 
 <button class="close-btn" onclick="closePage()">✖</button>
@@ -108,7 +114,6 @@ input[type="date"]{
 
 <script>
 
-// Default projects
 const defaultProjects = [
 
 {
@@ -225,10 +230,9 @@ actualCompletion:""
 
 ];
 
-// Load saved data if available
-let projects = JSON.parse(
-localStorage.getItem("projectsData")
-) || defaultProjects;
+let projects =
+JSON.parse(localStorage.getItem("projectsData"))
+|| defaultProjects;
 
 function updateTable(){
 
@@ -261,25 +265,45 @@ if(project.actualCompletion){
 
 const actualDate = new Date(project.actualCompletion);
 
-if(actualDate <= end){
+const actualOnly =
+actualDate.toISOString().split("T")[0];
+
+const targetOnly =
+end.toISOString().split("T")[0];
+
+if(actualOnly < targetOnly){
+
+statusClass = "ahead";
+statusText = "Completed Ahead of Time 🚀";
+
+}
+else if(actualOnly === targetOnly){
+
 statusClass = "completed";
 statusText = "Completed On Time ✅";
+
 }
 else{
+
 statusClass = "delayed";
-statusText = "Delayed 🟣";
+statusText = "Delayed 🔴";
+
 }
 
 }
 else{
 
 if(now > end){
+
 statusClass = "delayed";
-statusText = "Delayed 🟣";
+statusText = "Delayed 🔴";
+
 }
 else{
+
 statusClass = "running";
 statusText = "Running 🟢";
+
 }
 
 }
@@ -300,6 +324,7 @@ onchange="updateActualCompletion(${index},this.value)"
 
 <td>${remaining > 0 ? remaining : 0}</td>
 <td>${percent}%</td>
+
 <td class="${statusClass}">
 ${statusText}
 </td>
